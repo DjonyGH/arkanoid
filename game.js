@@ -10,10 +10,19 @@ let game = {
   rows: 4,
   cols: 8,
   ball: {
+    velocity: 3,
+    dx: 0,
+    dy: 0,
     x: 320,
     y: 280,
     width: 20,
     height: 20,
+    start() {
+      this.dy = -this.velocity
+    },
+    move() {
+      this.dy && (this.y += this.dy)
+    },
   },
   platform: {
     velocity: 6,
@@ -29,7 +38,7 @@ let game = {
     },
     move() {
       this.dx && (this.x += this.dx)
-      game.ball.x += this.dx
+      game.ball.y === 280 && (game.ball.x += this.dx)
     },
   },
   init: function () {
@@ -38,6 +47,7 @@ let game = {
   setEvents: function () {
     window.addEventListener('keydown', (e) => {
       if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') this.platform.start(e.code)
+      if (e.code === 'Space') this.ball.start()
     })
     window.addEventListener('keyup', () => {
       this.platform.stop()
@@ -81,6 +91,7 @@ let game = {
   },
   update: function () {
     this.platform.move()
+    this.ball.move()
   },
   run: function () {
     window.requestAnimationFrame(() => {
