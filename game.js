@@ -20,8 +20,16 @@ let game = {
     dx: 0,
     x: 280,
     y: 300,
+    start(direction) {
+      direction === 'ArrowLeft' && (this.dx = -this.velocity)
+      direction === 'ArrowRight' && (this.dx = this.velocity)
+    },
+    stop() {
+      this.dx = 0
+    },
     move() {
       this.dx && (this.x += this.dx)
+      game.ball.x += this.dx
     },
   },
   init: function () {
@@ -29,11 +37,10 @@ let game = {
   },
   setEvents: function () {
     window.addEventListener('keydown', (e) => {
-      e.code === 'ArrowLeft' && (this.platform.dx = -this.platform.velocity)
-      e.code === 'ArrowRight' && (this.platform.dx = this.platform.velocity)
+      if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') this.platform.start(e.code)
     })
-    window.addEventListener('keyup', (e) => {
-      this.platform.dx = 0
+    window.addEventListener('keyup', () => {
+      this.platform.stop()
     })
   },
   preload: async function () {
