@@ -41,7 +41,7 @@ let game = {
     bumpPlatform(platform) {
       this.dy = -this.dy
       const touchX = this.x + this.width / 2
-      this.dx = this.velocity * platform.getTouchOfffset(touchX)
+      this.dx = this.dx + platform.getTouchOfffset(touchX)
     },
   },
   platform: {
@@ -66,8 +66,8 @@ let game = {
       const offset = x - this.x
       console.log('offset', offset)
       if (offset > 20 && offset < 80) return 0
-      if (offset < 20) return -1
-      if (offset > 80) return 1
+      if (offset < 20) return -2
+      if (offset > 80) return 2
     },
   },
   random: function (min, max) {
