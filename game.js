@@ -19,9 +19,11 @@ let game = {
     height: 20,
     start() {
       this.dy = -this.velocity
+      this.dx = game.random(-this.velocity, this.velocity)
     },
     move() {
       this.dy && (this.y += this.dy)
+      this.dx && (this.x += this.dx)
     },
   },
   platform: {
@@ -40,6 +42,9 @@ let game = {
       this.dx && (this.x += this.dx)
       game.ball.y === 280 && (game.ball.x += this.dx)
     },
+  },
+  random: function (min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min)
   },
   init: function () {
     this.ctx = document.getElementById('mycanvas').getContext('2d')
@@ -72,6 +77,7 @@ let game = {
     }
   },
   render: function () {
+    this.ctx.clearRect(0, 0, 640, 360)
     this.ctx.drawImage(this.sprites.background, 0, 0)
     this.ctx.drawImage(
       this.sprites.ball,
