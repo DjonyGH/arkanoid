@@ -25,6 +25,19 @@ let game = {
       this.dy && (this.y += this.dy)
       this.dx && (this.x += this.dx)
     },
+    collide(element) {
+      const x = this.x + this.dx
+      const y = this.y + this.dy
+      return (
+        x + this.width > element.x &&
+        x < element.x + element.width &&
+        y < element.y + element.height &&
+        y + this.height > element.y
+      )
+    },
+    bumpBlock() {
+      this.dy = -this.dy
+    },
   },
   platform: {
     velocity: 6,
@@ -70,6 +83,8 @@ let game = {
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {
         this.blocks.push({
+          width: 60,
+          height: 20,
           x: 64 * col + 65,
           y: 24 * row + 35,
         })
@@ -98,6 +113,9 @@ let game = {
   update: function () {
     this.platform.move()
     this.ball.move()
+    for (let block of this.blocks) {
+      this.ball.collide(block) && this.ball.bumpBlock()
+    }
   },
   run: function () {
     window.requestAnimationFrame(() => {
