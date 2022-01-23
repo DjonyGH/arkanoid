@@ -38,12 +38,19 @@ let game = {
     bumpBlock() {
       this.dy = -this.dy
     },
+    bumpPlatform(platform) {
+      this.dy = -this.dy
+      const touchX = this.x + this.width / 2
+      this.dx = this.velocity * platform.getTouchOfffset(touchX)
+    },
   },
   platform: {
     velocity: 6,
     dx: 0,
     x: 280,
     y: 300,
+    width: 100,
+    height: 14,
     start(direction) {
       direction === 'ArrowLeft' && (this.dx = -this.velocity)
       direction === 'ArrowRight' && (this.dx = this.velocity)
@@ -54,6 +61,13 @@ let game = {
     move() {
       this.dx && (this.x += this.dx)
       game.ball.y === 280 && (game.ball.x += this.dx)
+    },
+    getTouchOfffset(x) {
+      const offset = x - this.x
+      console.log('offset', offset)
+      if (offset > 20 && offset < 80) return 0
+      if (offset < 20) return -1
+      if (offset > 80) return 1
     },
   },
   random: function (min, max) {
@@ -116,6 +130,7 @@ let game = {
     for (let block of this.blocks) {
       this.ball.collide(block) && this.ball.bumpBlock()
     }
+    this.ball.collide(this.platform) && this.ball.bumpPlatform(this.platform)
   },
   run: function () {
     window.requestAnimationFrame(() => {
