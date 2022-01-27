@@ -35,8 +35,9 @@ let game = {
         y + this.height > element.y
       )
     },
-    bumpBlock() {
+    bumpBlock(block) {
       this.dy = -this.dy
+      block.active = false
     },
     bumpPlatform(platform) {
       this.dy = -this.dy
@@ -64,7 +65,6 @@ let game = {
     },
     getTouchOfffset(x) {
       const offset = x - this.x
-      console.log('offset', offset)
       if (offset > 20 && offset < 80) return 0
       if (offset < 20) return -2
       if (offset > 80) return 2
@@ -97,6 +97,7 @@ let game = {
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {
         this.blocks.push({
+          active: true,
           width: 60,
           height: 20,
           x: 64 * col + 65,
@@ -121,14 +122,14 @@ let game = {
     )
     this.ctx.drawImage(this.sprites.platform, this.platform.x, this.platform.y)
     for (let block of this.blocks) {
-      this.ctx.drawImage(this.sprites.block, block.x, block.y)
+      block.active && this.ctx.drawImage(this.sprites.block, block.x, block.y)
     }
   },
   update: function () {
     this.platform.move()
     this.ball.move()
     for (let block of this.blocks) {
-      this.ball.collide(block) && this.ball.bumpBlock()
+      this.ball.collide(block) && block.active && this.ball.bumpBlock(block)
     }
     this.ball.collide(this.platform) && this.ball.bumpPlatform(this.platform)
   },
