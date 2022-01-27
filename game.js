@@ -1,5 +1,7 @@
 let game = {
   ctx: null,
+  width: 640,
+  height: 360,
   sprites: {
     background: null,
     ball: null,
@@ -40,9 +42,39 @@ let game = {
       block.active = false
     },
     bumpPlatform(platform) {
-      this.dy = -this.dy
-      const touchX = this.x + this.width / 2
-      this.dx = this.dx + platform.getTouchOfffset(touchX)
+      console.log('test', this.dy)
+      if (this.dy > 0) {
+        this.dy = -this.velocity
+        const touchX = this.x + this.width / 2
+        this.dx = this.dx + platform.getTouchOfffset(touchX)
+      }
+    },
+    collideWalls() {
+      const x = this.x + this.dx
+      const y = this.y + this.dy
+
+      const ballLeftSide = x
+      const ballRightSide = x + this.width
+      const ballTopSide = y
+      const ballBottomSide = y + this.height
+
+      const worldLeftSide = 0
+      const worldRightSide = game.width
+      const worldTopSide = 0
+      const worldBottomSide = game.height
+
+      if (ballLeftSide < worldLeftSide) {
+        this.x = 0
+        this.dx = this.velocity
+      } else if (ballRightSide > worldRightSide) {
+        this.x = worldRightSide - this.width
+        this.dx = -this.velocity
+      } else if (ballTopSide < worldTopSide) {
+        this.y = 0
+        this.dy = this.velocity
+      } else if (ballBottomSide > worldBottomSide) {
+        console.log('game over')
+      }
     },
   },
   platform: {
@@ -126,11 +158,18 @@ let game = {
     }
   },
   update: function () {
+    this.collideBlocks()
+    this.collidePlatform()
+    this.ball.collideWalls()
     this.platform.move()
     this.ball.move()
+  },
+  collideBlocks: function () {
     for (let block of this.blocks) {
       this.ball.collide(block) && block.active && this.ball.bumpBlock(block)
     }
+  },
+  collidePlatform: function () {
     this.ball.collide(this.platform) && this.ball.bumpPlatform(this.platform)
   },
   run: function () {
