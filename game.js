@@ -184,9 +184,15 @@ let game = {
     this.platform.move()
     this.ball.move()
   },
-  collideBlocks: function () {
+  collideBlocks: async function () {
     for (let block of this.blocks) {
       this.ball.collide(block) && block.active && this.ball.bumpBlock(block)
+    }
+    const activeBlocks = this.blocks.filter((block) => block.active)
+    if (!activeBlocks.length) {
+      this.running = false
+      const isOk = await confirm('YOU ARE WIN')
+      isOk && window.location.reload()
     }
   },
   collidePlatform: function () {
