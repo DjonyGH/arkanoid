@@ -1,5 +1,6 @@
 let game = {
   ctx: null,
+  running: true,
   width: 640,
   height: 360,
   sprites: {
@@ -42,14 +43,16 @@ let game = {
       block.active = false
     },
     bumpPlatform(platform) {
-      console.log('test', this.dy)
+      if (platform.dx) {
+        this.x += platform.dx
+      }
       if (this.dy > 0) {
         this.dy = -this.velocity
         const touchX = this.x + this.width / 2
         this.dx = this.dx + platform.getTouchOfffset(touchX)
       }
     },
-    collideWalls() {
+    async collideWalls() {
       const x = this.x + this.dx
       const y = this.y + this.dy
 
@@ -74,6 +77,9 @@ let game = {
         this.dy = this.velocity
       } else if (ballBottomSide > worldBottomSide) {
         console.log('game over')
+        game.running = false
+        const isOk = await confirm('GAME OVER')
+        isOk && window.location.reload()
       }
     },
   },
@@ -100,6 +106,19 @@ let game = {
       if (offset > 20 && offset < 80) return 0
       if (offset < 20) return -2
       if (offset > 80) return 2
+    },
+    collideWalls() {
+      const x = this.x + this.dx
+
+      const platformLeftSide = x
+      const platformRightSide = x + this.width
+
+      const worldLeftSide = 0
+      const worldRightSide = game.width
+
+      if (platformLeftSide < worldLeftSide || platformRightSide > worldRightSide) {
+        this.dx = 0
+      }
     },
   },
   random: function (min, max) {
@@ -161,6 +180,7 @@ let game = {
     this.collideBlocks()
     this.collidePlatform()
     this.ball.collideWalls()
+    this.platform.collideWalls()
     this.platform.move()
     this.ball.move()
   },
@@ -173,11 +193,13 @@ let game = {
     this.ball.collide(this.platform) && this.ball.bumpPlatform(this.platform)
   },
   run: function () {
-    window.requestAnimationFrame(() => {
-      this.update()
-      this.render()
-      this.run()
-    })
+    if (this.running) {
+      window.requestAnimationFrame(() => {
+        this.update()
+        this.render()
+        this.run()
+      })
+    }
   },
   start: async function () {
     this.init()
