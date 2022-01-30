@@ -1,3 +1,11 @@
+const loadAudio = (src) =>
+  new Promise((resolve) => {
+    const audio = new Audio(src)
+    audio.addEventListener('canplaythrough', () => {
+      resolve(audio)
+    })
+  })
+
 let game = {
   ctx: null,
   running: true,
@@ -8,6 +16,9 @@ let game = {
     ball: null,
     platform: null,
     block: null,
+  },
+  sounds: {
+    bump: null,
   },
   blocks: [],
   rows: 4,
@@ -41,6 +52,7 @@ let game = {
     bumpBlock(block) {
       this.dy = -this.dy
       block.active = false
+      game.sounds.bump.play()
     },
     bumpPlatform(platform) {
       if (platform.dx) {
@@ -142,6 +154,9 @@ let game = {
       this.sprites[key].src = `img/${key}.png`
       await this.sprites[key].decode()
       console.log(`${this.sprites[key]} width: ${this.sprites[key].width}`)
+    }
+    for (let key in this.sounds) {
+      this.sounds[key] = await loadAudio(`sounds/${key}.mp3`)
     }
   },
   create: function () {
